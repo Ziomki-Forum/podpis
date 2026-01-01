@@ -18,7 +18,7 @@
             font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding: 10px; /* Mniejszy padding na start */
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -59,10 +59,9 @@
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px;
         }
         
-        /* Większe suwaki na mobile */
         input[type="range"] { 
             width: 100%; cursor: pointer; margin: 10px 0; 
-            height: 20px; /* Łatwiej trafić palcem */
+            height: 20px;
         }
 
         .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
@@ -99,14 +98,12 @@
             position: relative;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            /* Tekstura papieru */
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
             display: inline-block; 
             min-width: 280px;
             transition: box-shadow 0.3s, background 0.3s;
         }
 
-        /* Styl dla trybu przezroczystego (aplikowany JS przy pobieraniu) */
         .transparent-mode {
             background-color: transparent !important;
             background-image: none !important;
@@ -119,31 +116,50 @@
             text-align: center;
             width: 300px;
             margin: 0 auto;
+            /* Flexbox dla lepszego centrowania przy zawijaniu tekstu */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .dotted-line {
             border-bottom: 2px dotted #333;
             width: 100%;
             margin-top: 5px;
+            margin-bottom: 5px;
         }
 
         .role-display {
             font-family: 'Courier Prime', monospace;
             font-size: 13px; color: #333;
             text-transform: uppercase; letter-spacing: 1px;
-            margin-top: 5px;
+            /* Zmiana: Obsługa długiego tekstu */
+            white-space: normal;
+            word-wrap: break-word;
+            width: 100%;
+            line-height: 1.2;
+            position: relative; /* Dla przesuwania */
         }
 
         .sig-wrapper {
             position: relative;
-            height: 80px;
+            min-height: 80px; /* Zmiana z height na min-height */
             width: 100%;
-            display: flex; justify-content: center; align-items: flex-end;
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end;
+            margin-bottom: 5px;
         }
 
         .generated-sig {
-            font-size: 40px; line-height: 1;
-            white-space: nowrap;
+            font-size: 40px; 
+            line-height: 0.8; /* Mniejsza interlinia dla wielowierszowych podpisów */
+            /* Zmiana: Obsługa długiego tekstu */
+            white-space: normal;
+            word-break: break-word;
+            text-align: center;
+            width: 100%;
+            
             transform-origin: center bottom;
             mix-blend-mode: multiply;
         }
@@ -190,9 +206,8 @@
             padding: 4px; border-radius: 4px; display: none; text-align: center;
         }
         .stamp-container:hover .drag-hint { display: block; }
-        /* Na mobile pokazujemy hint zawsze przez 2 sekundy po załadowaniu lub wcale */
 
-        /* --- STYLIZACJA CHECKBOXÓW (Radio buttony jako kafelki) --- */
+        /* --- STYLIZACJA CHECKBOXÓW --- */
         .bg-options { display: flex; gap: 10px; margin-top: 5px; }
         .bg-option {
             flex: 1; display: flex; align-items: center; gap: 5px;
@@ -209,31 +224,29 @@
             
             .controls-panel {
                 min-width: 100%; width: 100%;
-                padding: 15px; order: 2; /* Kontrolki pod podglądem na bardzo małych, lub nad - zależy od preferencji */
+                padding: 15px; order: 2;
             }
             
             .preview-area {
                 min-width: 100%; width: 100%;
                 padding: 5px;
-                order: 1; /* Podgląd pierwszy na górze */
-                background: #e0e5e8; /* Lekkie wyróżnienie tła obszaru podglądu */
+                order: 1;
+                background: #e0e5e8;
                 border-radius: 8px;
-                overflow-x: auto; /* Pozwala przewijać jeśli podpis jest bardzo szeroki */
+                overflow-x: auto;
             }
 
             #paper-sheet {
-                /* Na mobile papier zajmuje max szerokość ekranu */
                 max-width: 100%; 
                 min-width: auto;
                 box-sizing: border-box;
             }
 
             .signature-block {
-                width: 100% !important; /* Wymuszamy responsywność bloku na mobile */
-                max-width: 320px; /* Ale nie szerszy niż typowy ekran */
+                width: 100% !important;
+                max-width: 320px;
             }
             
-            /* Ukrywamy suwak szerokości na mobile, bo i tak wymuszamy 100% */
             .hide-mobile { display: none; }
             
             h3 { font-size: 15px; }
@@ -282,11 +295,7 @@
             </label>
         </div>
 
-        <h3>2. Treść</h3>
-        <div class="control-group">
-            <input type="text" id="roleInput" placeholder="Stanowisko" value="Główny Księgowy" oninput="updateContent()">
-        </div>
-        
+        <h3>2. Treść Podpisu</h3>
         <div class="tabs">
             <button class="tab-btn active" onclick="setMode('type')" id="btnType">Klawiatura</button>
             <button class="tab-btn" onclick="setMode('draw')" id="btnDraw">Rysowanie</button>
@@ -316,10 +325,35 @@
                 <option value="#006400">Zielony</option>
             </select>
         </div>
+        
+        <div class="control-group">
+            <label>Pozycja Podpisu (X / Y):</label>
+            <div style="display:flex; gap:10px;">
+                 <input type="range" min="-50" max="50" value="0" oninput="adjustSignatureLayout()" id="sigXRange">
+                 <input type="range" min="-50" max="50" value="0" oninput="adjustSignatureLayout()" id="sigYRange">
+            </div>
+        </div>
 
-        <h3>3. Pieczęć</h3>
+        <h3>3. Stanowisko</h3>
+        <div class="control-group">
+            <input type="text" id="roleInput" placeholder="Stanowisko" value="Główny Księgowy" oninput="updateContent()">
+        </div>
+        <div class="control-group">
+            <label>Rozmiar czcionki:</label>
+            <input type="range" min="8" max="20" value="13" oninput="adjustRoleLayout()" id="roleSizeRange">
+        </div>
+        <div class="control-group">
+            <label>Pozycja Stanowiska (X / Y):</label>
+            <div style="display:flex; gap:10px;">
+                 <input type="range" min="-50" max="50" value="0" oninput="adjustRoleLayout()" id="roleXRange">
+                 <input type="range" min="-30" max="30" value="0" oninput="adjustRoleLayout()" id="roleYRange">
+            </div>
+        </div>
+
+
+        <h3>4. Pieczęć i Blok</h3>
         <input type="file" id="stampUpload" accept="image/*" style="font-size:12px; margin-bottom:10px;">
-        <div style="font-size:13px; display:flex; flex-wrap:wrap; gap:15px;">
+        <div style="font-size:13px; display:flex; flex-wrap:wrap; gap:15px; margin-bottom:10px;">
             <label style="display:flex; align-items:center; gap:5px;">
                 <input type="checkbox" id="bwCheck" onchange="processStampImage()"> 
                 Czarno-biała
@@ -329,19 +363,10 @@
                 Ukryj
             </label>
         </div>
-
-        <h3>4. Dopasowanie</h3>
+        
         <div class="control-group hide-mobile">
-            <label>Szerokość całego bloku:</label>
-            <input type="range" min="200" max="500" value="300" oninput="adjustLayout()" id="widthRange">
-        </div>
-        <div class="control-group">
-            <label>Przesunięcie podpisu (Góra/Dół):</label>
-            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posYRange">
-        </div>
-        <div class="control-group">
-            <label>Przesunięcie podpisu (Lewo/Prawo):</label>
-            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posXRange">
+            <label>Szerokość bloku:</label>
+            <input type="range" min="200" max="500" value="300" oninput="adjustBlockWidth()" id="widthRange">
         </div>
 
         <button class="btn-action btn-green" onclick="downloadPNG()">⬇ POBIERZ PNG</button>
@@ -354,6 +379,7 @@
     let mode = 'type';
     const sigBlock = document.getElementById('sigBlock');
     const textSig = document.getElementById('textSig');
+    const roleDisplay = document.getElementById('roleDisplay');
     const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
     const stampDiv = document.getElementById('draggableStamp');
@@ -362,7 +388,7 @@
 
     // --- 1. TREŚĆ I KOLORY ---
     function updateContent() {
-        document.getElementById('roleDisplay').textContent = document.getElementById('roleInput').value;
+        roleDisplay.textContent = document.getElementById('roleInput').value;
         textSig.textContent = document.getElementById('nameInput').value;
         textSig.style.fontFamily = document.getElementById('fontSelect').value;
     }
@@ -393,22 +419,36 @@
             canvas.classList.add('canvas-helper');
             ctx.strokeStyle = document.getElementById('colorSelect').value;
         }
+        adjustSignatureLayout(); // Odśwież pozycję po zmianie trybu
     }
 
-    // --- 3. POZYCJONOWANIE ---
-    function adjustLayout() {
-        // Na mobile ignorujemy suwak szerokości
+    // --- 3. POZYCJONOWANIE (Nowe funkcje) ---
+    function adjustBlockWidth() {
         if (window.innerWidth > 768) {
             const width = document.getElementById('widthRange').value;
             sigBlock.style.width = width + 'px';
         } else {
             sigBlock.style.width = '100%';
         }
+    }
 
-        const y = document.getElementById('posYRange').value;
-        const x = document.getElementById('posXRange').value;
+    function adjustSignatureLayout() {
+        const x = document.getElementById('sigXRange').value;
+        const y = document.getElementById('sigYRange').value;
         const target = mode === 'type' ? textSig : canvas;
-        target.style.transform = `translate(${x}px, ${y}px) rotate(${mode === 'type' ? -3 : 0}deg)`;
+        
+        // Dla trybu pisania dodajemy lekką rotację dla realizmu
+        const rotate = mode === 'type' ? -3 : 0;
+        target.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+    }
+
+    function adjustRoleLayout() {
+        const x = document.getElementById('roleXRange').value;
+        const y = document.getElementById('roleYRange').value;
+        const size = document.getElementById('roleSizeRange').value;
+        
+        roleDisplay.style.transform = `translate(${x}px, ${y}px)`;
+        roleDisplay.style.fontSize = size + 'px';
     }
 
     // --- 4. DRAG & DROP PIECZĘCI ---
@@ -479,7 +519,7 @@
 
                 for (let i = 0; i < data.length; i += 4) {
                     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                    const contrast = avg > 120 ? 255 : avg * 0.5; // Prosty kontrast
+                    const contrast = avg > 120 ? 255 : avg * 0.5;
                     data[i] = contrast; data[i + 1] = contrast; data[i + 2] = contrast;
                 }
                 tCtx.putImageData(imgData, 0, 0);
@@ -530,38 +570,37 @@
     }
     function clearCanvas() { ctx.clearRect(0,0,canvas.width, canvas.height); }
 
-    // --- 7. POBIERANIE (Z OBSŁUGĄ PRZEŹROCZYSTOŚCI) ---
+    // --- 7. POBIERANIE ---
     function downloadPNG() {
         const element = document.getElementById('paper-sheet');
         const bgType = document.querySelector('input[name="bgType"]:checked').value;
         
-        // 1. Przygotowanie do zrzutu
         if(mode === 'draw') canvas.classList.remove('canvas-helper');
         
-        // Jeśli wybrano przezroczystość, usuwamy style papieru
         if (bgType === 'transparent') {
             element.classList.add('transparent-mode');
         }
 
         html2canvas(element, {
             scale: 3,
-            backgroundColor: null // To kluczowe dla przezroczystości
+            backgroundColor: null
         }).then(c => {
             const link = document.createElement('a');
             link.download = `podpis_${bgType}.png`;
             link.href = c.toDataURL('image/png');
             link.click();
             
-            // 2. Sprzątanie po zrzucie
             if(mode === 'draw') canvas.classList.add('canvas-helper');
             element.classList.remove('transparent-mode');
         });
     }
 
     // Inicjalizacja
-    adjustLayout(); 
-    // Dodatkowy nasłuch resize dla mobile
-    window.addEventListener('resize', adjustLayout);
+    adjustBlockWidth();
+    adjustSignatureLayout();
+    adjustRoleLayout();
+    
+    window.addEventListener('resize', adjustBlockWidth);
 </script>
 
 </body>
