@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Podpisów PRO</title>
+    <title>Generator Podpisów: Wersja Finalna</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Nothing+You+Could+Do&family=Mrs+Saint+Delafield&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <style>
         :root {
             --primary-color: #2c3e50;
-            --bg-color: #f0f2f5;
+            --bg-color: #eef2f3;
+            --accent-color: #3498db;
         }
 
         body {
@@ -19,458 +20,466 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
-        .container {
+        .main-wrapper {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 1100px;
+            justify-content: center;
             width: 100%;
+            max-width: 1200px;
         }
 
-        /* --- Panel Sterowania --- */
-        .controls {
+        /* --- LEWY PANEL (Kontrolki) --- */
+        .controls-panel {
             flex: 1;
-            min-width: 320px;
+            min-width: 300px;
+            max-width: 400px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             gap: 15px;
-            border-right: 1px solid #eee;
-            padding-right: 20px;
+            height: fit-content;
         }
 
-        h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h3 { margin: 0 0 10px 0; color: var(--primary-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px; }
         
-        label { font-size: 14px; font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
+        .control-group { margin-bottom: 5px; }
+        label { font-size: 13px; font-weight: bold; color: #666; display: block; margin-bottom: 4px; }
+        
         input[type="text"], select {
-            width: 100%; box-sizing: border-box; padding: 8px;
-            border: 1px solid #ccc; border-radius: 4px;
+            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;
         }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 10px; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .tab-btn {
-            flex: 1; padding: 8px; border: 1px solid #ccc; background: #f9f9f9;
-            cursor: pointer; border-radius: 4px; font-weight: bold;
+            flex: 1; padding: 8px; border: 1px solid #ddd; background: #f9f9f9;
+            cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 13px;
         }
         .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        
         .mode-content { display: none; }
         .mode-content.active { display: block; }
 
-        .file-upload { margin-top: 5px; margin-bottom: 10px; width: 100%; }
-        
-        .radio-group { display: flex; gap: 15px; font-weight: normal; margin-bottom: 10px; }
-        .radio-group label { font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px;}
-
-        .download-btn {
-            background-color: #27ae60; color: white; border: none; padding: 15px;
-            border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer;
-            margin-top: auto; transition: background 0.2s;
+        .btn-action {
+            width: 100%; padding: 12px; border: none; border-radius: 6px;
+            font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px;
+            transition: 0.2s;
         }
-        .download-btn:hover { background-color: #219150; }
-        
-        .clear-btn {
-            background: #e74c3c; color: white; border: none; padding: 5px 10px;
-            border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 5px;
-        }
+        .btn-green { background: #27ae60; color: white; }
+        .btn-green:hover { background: #219150; }
+        .btn-red { background: #e74c3c; color: white; font-size: 12px; padding: 6px; width: auto;}
 
-        /* --- Panel Podglądu --- */
+        /* --- PRAWY PANEL (Podgląd) --- */
         .preview-area {
-            flex: 1.5;
+            flex: 2;
             min-width: 350px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #7f8c8d;
             padding: 20px;
-            border-radius: 8px;
         }
 
         #paper-sheet {
             background-color: #fff;
-            width: 100%;
-            max-width: 550px;
-            min-height: 350px;
             position: relative;
-            padding: 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            /* Szum papieru */
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            display: inline-block; 
+            min-width: 250px;
         }
 
         .signature-block {
             position: relative;
-            margin-top: 60px;
-            width: 90%;
-            margin-left: auto; margin-right: auto;
             text-align: center;
+            width: 300px;
+            margin: 0 auto;
         }
 
-        /* Linia kropkowana */
         .dotted-line {
             border-bottom: 2px dotted #333;
             width: 100%;
-            margin: 0;
-            position: relative;
-            z-index: 1;
+            margin-top: 5px;
         }
 
         .role-display {
             font-family: 'Courier Prime', monospace;
-            font-size: 13px;
-            color: #444;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 8px;
-            position: relative;
-            z-index: 1;
+            font-size: 13px; color: #333;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-top: 5px;
         }
 
-        /* Obszar podpisu (tekst lub canvas) */
-        .signature-display-area {
-            min-height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; 
+        .sig-wrapper {
             position: relative;
-            z-index: 5; /* Podpis jest niżej niż pieczęć */
-            padding-bottom: 2px;
+            height: 80px;
+            width: 100%;
+            display: flex; justify-content: center; align-items: flex-end;
         }
 
         .generated-sig {
-            font-size: 50px;
-            line-height: 0.8;
-            transform: rotate(-3deg);
-            text-shadow: 0 0 1px rgba(0,0,0,0.2); 
+            font-size: 40px; line-height: 1;
+            white-space: nowrap;
+            transform-origin: center bottom;
             mix-blend-mode: multiply;
         }
 
-        /* STYLIZACJA CANVASA DLA UŻYTKOWNIKA (pomocnicza) */
-        .drawing-helper-border {
-            border: 2px dashed #3498db; /* Niebieska przerywana linia */
-            background-color: rgba(52, 152, 219, 0.05); /* Lekkie tło */
-            border-radius: 4px;
-        }
-        
         #drawingCanvas {
             mix-blend-mode: multiply;
-            touch-action: none; /* Blokada przewijania na mobile */
+            touch-action: none;
+        }
+        
+        .canvas-helper {
+            border: 1px dashed rgba(52, 152, 219, 0.4);
+            background: rgba(52, 152, 219, 0.03);
         }
 
-        /* --- PIECZĘĆ --- */
+        /* --- PIECZĘĆ (DRAGGABLE) --- */
         .stamp-container {
             position: absolute;
-            /* Pozycjonowanie względem bloku podpisu */
-            left: -30px; 
-            bottom: 30px;
-            width: 140px;
-            height: 140px;
-            
-            /* WARSTWOWOŚĆ: Najwyżej */
-            z-index: 50; 
-            
-            opacity: 0.9;
+            width: 120px; height: 120px;
+            z-index: 100;
+            cursor: move;
+            user-select: none;
+            left: -40px; top: 10px;
+            display: flex; justify-content: center; align-items: center;
+            mix-blend-mode: multiply;
             transform: rotate(-15deg);
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        }
+        
+        .stamp-container:active {
+            opacity: 0.7;
+            transform: rotate(-15deg) scale(1.05);
         }
 
-        /* Obrazek wgrany przez usera */
-        .stamp-img-custom {
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain;
-            mix-blend-mode: multiply; /* Usuwa białe tło */
-        }
-
-        /* Efekt czarno-białej pieczątki */
-        .stamp-effect-bw {
-            filter: grayscale(100%) contrast(150%) brightness(0.95);
-        }
-
-        /* Domyślna pieczęć CSS */
         .css-stamp {
             width: 100%; height: 100%;
-            border: 4px double #d32f2f;
-            border-radius: 50%;
-            color: #d32f2f;
-            display: flex;
-            justify-content: center; align-items: center;
-            font-weight: bold; font-family: 'Courier Prime', monospace;
-            text-align: center; font-size: 12px;
-            padding: 10px; box-sizing: border-box;
-            background: rgba(255,255,255,0.1); /* lekkie wypełnienie */
-            mix-blend-mode: multiply;
+            border: 3px double #c0392b; border-radius: 50%; color: #c0392b;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Courier Prime', monospace; font-size: 11px; font-weight: bold;
+            text-align: center; background: rgba(255,255,255,0.1);
         }
-        .css-stamp span { border: 2px solid #d32f2f; padding: 15px 2px; border-radius: 2px; display: block; width: 100%; }
+        .css-stamp span { border: 2px solid #c0392b; padding: 10px 2px; width: 90%; display: block; }
+        
+        .stamp-img-custom { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        
+        .drag-hint {
+            position: absolute; top: -20px; left: 0; right: 0;
+            font-size: 10px; background: #333; color: #fff;
+            padding: 2px; border-radius: 3px; display: none;
+        }
+        .stamp-container:hover .drag-hint { display: block; }
 
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="controls">
-        <h3>Dane pod linią</h3>
-        <div>
-            <label>Stanowisko / Funkcja:</label>
-            <input type="text" id="roleInput" value="Prezes Zarządu" oninput="updateText()">
+<div class="main-wrapper">
+    <div class="controls-panel">
+        <h3>1. Treść</h3>
+        <div class="control-group">
+            <input type="text" id="roleInput" placeholder="Stanowisko" value="Główny Księgowy" oninput="updateContent()">
         </div>
-
-        <h3>Podpis</h3>
+        
         <div class="tabs">
             <button class="tab-btn active" onclick="setMode('type')" id="btnType">Klawiatura</button>
             <button class="tab-btn" onclick="setMode('draw')" id="btnDraw">Rysowanie</button>
         </div>
 
         <div id="modeType" class="mode-content active">
-            <label>Imię i Nazwisko:</label>
-            <input type="text" id="nameInput" value="Marek Nowak" oninput="updateText()">
-            <label style="margin-top: 10px;">Styl pisma:</label>
-            <select id="fontSelect" onchange="updateText()">
-                <option value="'Nothing You Could Do', cursive">Szybki (Gryzmoły)</option>
-                <option value="'Mrs Saint Delafield', cursive">Elegancki (Kaligrafia)</option>
-            </select>
-            <label style="margin-top: 10px;">Kolor:</label>
-            <select id="colorSelect" onchange="updateColor()">
-                <option value="#000099">Niebieski</option>
-                <option value="#1a1a1a">Czarny</option>
-                <option value="#006400">Zielony</option>
+            <input type="text" id="nameInput" value="Jan Kowalski" oninput="updateContent()">
+            <select id="fontSelect" onchange="updateContent()" style="margin-top:5px;">
+                <option value="'Nothing You Could Do', cursive">Styl 1: Szybki</option>
+                <option value="'Mrs Saint Delafield', cursive">Styl 2: Elegancki</option>
             </select>
         </div>
 
         <div id="modeDraw" class="mode-content">
-            <label>Narysuj podpis w ramce po prawej stronie.</label>
-            <button class="clear-btn" onclick="clearCanvas()">Wyczyść pole</button>
-            <label style="margin-top: 10px;">Grubość linii:</label>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label>Grubość:</label>
+                <button class="btn-red" onclick="clearCanvas()">Wyczyść</button>
+            </div>
             <input type="range" id="penSize" min="1" max="5" value="2">
         </div>
 
-        <h3>Pieczęć (Warstwa Wierzchnia)</h3>
-        <label>Wgraj plik (JPG/PNG):</label>
-        <input type="file" id="stampUpload" accept="image/*" class="file-upload">
-        
-        <div class="radio-group">
-            <label><input type="radio" name="stampStyle" value="original" checked onchange="updateStampStyle()"> Oryginał</label>
-            <label><input type="radio" name="stampStyle" value="bw" onchange="updateStampStyle()"> Czarno-biała (Efekt)</label>
+        <div class="control-group">
+            <label>Kolor tuszu:</label>
+            <select id="colorSelect" onchange="updateColors()">
+                <option value="#000080">Granatowy</option>
+                <option value="#000000">Czarny</option>
+                <option value="#006400">Zielony</option>
+            </select>
         </div>
 
-        <label style="font-size:12px; margin-top:5px;">Lub wybierz domyślną:</label>
-        <select id="defaultStampSel" onchange="updateDefaultStamp()">
-            <option value="css">Domyślna (CSS)</option>
-            <option value="none">Brak pieczęci</option>
-        </select>
+        <h3>2. Pieczęć</h3>
+        <input type="file" id="stampUpload" accept="image/*" style="font-size:12px;">
+        <div style="margin-top:5px; font-size:12px;">
+            <label style="display:inline;"><input type="checkbox" id="bwCheck" onchange="processStampImage()"> Czarno-biała (Wymuś)</label>
+            <label style="display:inline; margin-left:10px;"><input type="checkbox" id="noStampCheck" onchange="toggleStamp()"> Ukryj</label>
+        </div>
 
-        <button class="download-btn" onclick="downloadPNG()">⬇ Pobierz Podpis</button>
+        <h3>3. Pozycjonowanie (Dopasuj)</h3>
+        <div class="control-group">
+            <label>Szerokość linii/obszaru:</label>
+            <input type="range" min="150" max="500" value="300" oninput="adjustLayout()" id="widthRange">
+        </div>
+        <div class="control-group">
+            <label>Przesunięcie podpisu (Góra/Dół):</label>
+            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posYRange">
+        </div>
+        <div class="control-group">
+            <label>Przesunięcie podpisu (Lewo/Prawo):</label>
+            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posXRange">
+        </div>
+        <p style="font-size:11px; color:#888;">💡 Wskazówka: Pieczęć możesz przesuwać myszką bezpośrednio na obrazku.</p>
+
+        <button class="btn-action btn-green" onclick="downloadPNG()">⬇ Pobierz (Dopasowany)</button>
     </div>
 
     <div class="preview-area">
         <div id="paper-sheet">
             
-            <div class="signature-block">
+            <div class="signature-block" id="sigBlock">
                 
-                <div class="stamp-container" id="stampContainer">
-                    <div class="css-stamp"><span>ZATWIERDZONO<br>ZARZĄD</span></div>
+                <div class="stamp-container" id="draggableStamp">
+                    <div class="drag-hint">Przesuń mnie</div>
+                    <div id="stampInner" class="css-stamp">
+                        <span>ZATWIERDZONO<br>ORYGINAŁ</span>
+                    </div>
                 </div>
 
-                <div class="signature-display-area">
-                    <div id="textSignature" class="generated-sig">Marek Nowak</div>
-                    <canvas id="drawingCanvas" width="400" height="150" style="display:none;"></canvas>
+                <div class="sig-wrapper" id="sigWrapper">
+                    <div id="textSig" class="generated-sig">Jan Kowalski</div>
+                    <canvas id="drawingCanvas" width="300" height="100" style="display:none;"></canvas>
                 </div>
 
                 <div class="dotted-line"></div>
-                <div class="role-display" id="roleDisplay">Prezes Zarządu</div>
-            </div>
+                <div class="role-display" id="roleDisplay">Główny Księgowy</div>
 
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- Globalne ---
-    let currentMode = 'type';
-    const textSigDiv = document.getElementById('textSignature');
+    // --- ZMIENNE ---
+    let mode = 'type';
+    const sigBlock = document.getElementById('sigBlock');
+    const textSig = document.getElementById('textSig');
     const canvas = document.getElementById('drawingCanvas');
     const ctx = canvas.getContext('2d');
-    const stampContainer = document.getElementById('stampContainer');
+    const stampDiv = document.getElementById('draggableStamp');
+    const stampInner = document.getElementById('stampInner');
     
-    // --- Rysowanie (Canvas) ---
-    let isDrawing = false;
-    let lastX = 0, lastY = 0;
+    // Zmienne do przechowywania oryginalnej pieczęci
+    let originalStampSrc = null;
 
-    function initCanvas() {
-        // Myszka
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        });
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mouseout', () => isDrawing = false);
-
-        // Dotyk
-        canvas.addEventListener('touchstart', (e) => {
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            lastX = e.touches[0].clientX - rect.left;
-            lastY = e.touches[0].clientY - rect.top;
-            e.preventDefault();
-        });
-        canvas.addEventListener('touchmove', (e) => {
-            if(!isDrawing) return;
-            e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const x = e.touches[0].clientX - rect.left;
-            const y = e.touches[0].clientY - rect.top;
-            drawStroke(x, y);
-        });
+    // --- 1. TREŚĆ I KOLORY ---
+    function updateContent() {
+        document.getElementById('roleDisplay').textContent = document.getElementById('roleInput').value;
+        textSig.textContent = document.getElementById('nameInput').value;
+        textSig.style.fontFamily = document.getElementById('fontSelect').value;
     }
 
-    function draw(e) {
-        if (!isDrawing) return;
-        drawStroke(e.offsetX, e.offsetY);
+    function updateColors() {
+        const color = document.getElementById('colorSelect').value;
+        textSig.style.color = color;
+        textSig.style.textShadow = `0 0 1px ${color}`;
+        ctx.strokeStyle = color;
     }
 
-    function drawStroke(x, y) {
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = document.getElementById('penSize').value;
-        ctx.strokeStyle = document.getElementById('colorSelect').value;
-        
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        [lastX, lastY] = [x, y];
-    }
-
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // --- Obsługa Trybów ---
-    function setMode(mode) {
-        currentMode = mode;
+    // --- 2. TRYBY ---
+    function setMode(newMode) {
+        mode = newMode;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
-
-        if (mode === 'type') {
+        
+        if(mode === 'type') {
             document.getElementById('btnType').classList.add('active');
             document.getElementById('modeType').classList.add('active');
-            textSigDiv.style.display = 'block';
+            textSig.style.display = 'block';
             canvas.style.display = 'none';
         } else {
             document.getElementById('btnDraw').classList.add('active');
             document.getElementById('modeDraw').classList.add('active');
-            textSigDiv.style.display = 'none';
-            
-            // Włączamy canvas i dodajemy widoczną ramkę edycyjną
+            textSig.style.display = 'none';
             canvas.style.display = 'block';
-            canvas.classList.add('drawing-helper-border');
-            
+            canvas.classList.add('canvas-helper');
             ctx.strokeStyle = document.getElementById('colorSelect').value;
         }
     }
 
-    // --- Aktualizacja Tekstu i Koloru ---
-    function updateText() {
-        document.getElementById('roleDisplay').textContent = document.getElementById('roleInput').value;
-        textSigDiv.textContent = document.getElementById('nameInput').value;
-        textSigDiv.style.fontFamily = document.getElementById('fontSelect').value;
+    // --- 3. POZYCJONOWANIE ---
+    function adjustLayout() {
+        const width = document.getElementById('widthRange').value;
+        sigBlock.style.width = width + 'px';
+
+        const y = document.getElementById('posYRange').value;
+        const x = document.getElementById('posXRange').value;
+        const target = mode === 'type' ? textSig : canvas;
+        target.style.transform = `translate(${x}px, ${y}px) rotate(${mode === 'type' ? -3 : 0}deg)`;
     }
 
-    function updateColor() {
-        const color = document.getElementById('colorSelect').value;
-        textSigDiv.style.color = color;
-        textSigDiv.style.textShadow = `0 0 1px ${color}`;
-        ctx.strokeStyle = color;
+    // --- 4. DRAG & DROP PIECZĘCI ---
+    let isDragging = false;
+    let offset = { x: 0, y: 0 };
+
+    stampDiv.addEventListener('mousedown', startDrag);
+    stampDiv.addEventListener('touchstart', startDrag, {passive: false});
+
+    function startDrag(e) {
+        isDragging = true;
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        offset.x = clientX - stampDiv.getBoundingClientRect().left;
+        offset.y = clientY - stampDiv.getBoundingClientRect().top;
+        stampDiv.style.cursor = 'grabbing';
     }
 
-    // --- Obsługa Pieczęci (Wgrywanie + Styl) ---
-    const stampInput = document.getElementById('stampUpload');
-    const defaultStampSel = document.getElementById('defaultStampSel');
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('touchmove', moveDrag, {passive: false});
 
-    stampInput.addEventListener('change', function(e) {
+    function moveDrag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        const parentRect = sigBlock.getBoundingClientRect();
+        let newLeft = clientX - parentRect.left - offset.x;
+        let newTop = clientY - parentRect.top - offset.y;
+        stampDiv.style.left = newLeft + 'px';
+        stampDiv.style.top = newTop + 'px';
+    }
+
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+
+    function endDrag() { isDragging = false; stampDiv.style.cursor = 'move'; }
+
+    // --- 5. OBSŁUGA PIECZĘCI (ZAAWANSOWANA KONWERSJA BW) ---
+    document.getElementById('stampUpload').addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                // Tworzymy obrazek
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'stamp-img-custom';
-                img.id = 'uploadedStampImg';
-                
-                stampContainer.innerHTML = '';
-                stampContainer.appendChild(img);
-                
-                defaultStampSel.value = 'none';
-                updateStampStyle(); // Aplikuj styl (org/bw) od razu
+            reader.onload = function(evt) {
+                originalStampSrc = evt.target.result; // Zapisz oryginał
+                processStampImage(); // Uruchom przetwarzanie
             }
             reader.readAsDataURL(this.files[0]);
         }
     });
 
-    function updateDefaultStamp() {
-        const val = defaultStampSel.value;
-        if (val === 'none') {
-            stampContainer.innerHTML = '';
-            stampInput.value = '';
-        } else if (val === 'css') {
-            stampContainer.innerHTML = `<div class="css-stamp"><span>ZATWIERDZONO<br>ZARZĄD</span></div>`;
-            stampInput.value = '';
-        }
-    }
+    function processStampImage() {
+        if (!originalStampSrc) return; // Jeśli nic nie wgrano, nic nie rób
 
-    function updateStampStyle() {
-        const style = document.querySelector('input[name="stampStyle"]:checked').value;
-        const img = document.getElementById('uploadedStampImg');
-        
-        if (img) {
-            if (style === 'bw') {
-                img.classList.add('stamp-effect-bw');
+        const isBW = document.getElementById('bwCheck').checked;
+        const img = new Image();
+        img.src = originalStampSrc;
+
+        img.onload = () => {
+            if (isBW) {
+                // FIZYCZNA KONWERSJA NA BW (PIKSELE)
+                const tempCanvas = document.createElement('canvas');
+                const tCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                
+                tCtx.drawImage(img, 0, 0);
+                const imgData = tCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = imgData.data;
+
+                // Algorytm szarości i kontrastu
+                for (let i = 0; i < data.length; i += 4) {
+                    // Średnia jasność
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    // Proste progowanie lub pozostawienie szarości
+                    // Tu robimy szarość + lekki kontrast
+                    let gray = avg;
+                    
+                    data[i] = gray;     // R
+                    data[i + 1] = gray; // G
+                    data[i + 2] = gray; // B
+                    // Alpha (data[i+3]) zostawiamy bez zmian
+                }
+                tCtx.putImageData(imgData, 0, 0);
+                
+                // Wstawiamy przerobiony obrazek
+                stampInner.innerHTML = `<img src="${tempCanvas.toDataURL()}" class="stamp-img-custom">`;
             } else {
-                img.classList.remove('stamp-effect-bw');
+                // Wstawiamy oryginał
+                stampInner.innerHTML = `<img src="${originalStampSrc}" class="stamp-img-custom">`;
             }
-        }
+            
+            stampInner.className = ''; // usuwamy styl CSS ramki
+        };
     }
 
-    // --- POBIERANIE (Z usuwaniem ramki) ---
+    function toggleStamp() {
+        const hide = document.getElementById('noStampCheck').checked;
+        stampDiv.style.display = hide ? 'none' : 'flex';
+    }
+
+    // --- 6. RYSOWANIE ---
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+
+    canvas.addEventListener('mousedown', (e) => { drawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; });
+    canvas.addEventListener('mousemove', drawLine);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mouseout', () => drawing = false);
+
+    canvas.addEventListener('touchstart', (e) => {
+        drawing = true;
+        const rect = canvas.getBoundingClientRect();
+        lastX = e.touches[0].clientX - rect.left;
+        lastY = e.touches[0].clientY - rect.top;
+        e.preventDefault();
+    });
+    canvas.addEventListener('touchmove', (e) => {
+        if(!drawing) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        drawStroke(x, y);
+    });
+
+    function drawLine(e) { if(drawing) drawStroke(e.offsetX, e.offsetY); }
+
+    function drawStroke(x, y) {
+        ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.lineWidth = document.getElementById('penSize').value;
+        ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+        [lastX, lastY] = [x, y];
+    }
+    function clearCanvas() { ctx.clearRect(0,0,canvas.width, canvas.height); }
+
+    // --- 7. POBIERANIE ---
     function downloadPNG() {
         const element = document.getElementById('paper-sheet');
-        
-        // 1. ZANIM zrobimy zrzut: Usuń ramkę pomocniczą z canvasa
-        if (currentMode === 'draw') {
-            canvas.classList.remove('drawing-helper-border');
-        }
+        if(mode === 'draw') canvas.classList.remove('canvas-helper');
 
         html2canvas(element, {
             scale: 3,
             backgroundColor: null
-        }).then(capturedCanvas => {
+        }).then(c => {
             const link = document.createElement('a');
-            link.download = 'podpis_pieczec.png';
-            link.href = capturedCanvas.toDataURL('image/png');
+            link.download = 'podpis.png';
+            link.href = c.toDataURL('image/png');
             link.click();
-
-            // 2. PO zrobieniu zrzutu: Przywróć ramkę, żeby user mógł dalej edytować
-            if (currentMode === 'draw') {
-                canvas.classList.add('drawing-helper-border');
-            }
+            
+            if(mode === 'draw') canvas.classList.add('canvas-helper');
         });
     }
 
-    // Inicjalizacja
-    initCanvas();
-    updateColor();
+    adjustLayout(); 
 </script>
 
 </body>
