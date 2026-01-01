@@ -2,8 +2,8 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Podpisów: Wersja Finalna</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Generator Podpisów</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Nothing+You+Could+Do&family=Mrs+Saint+Delafield&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -18,7 +18,7 @@
             font-family: 'Roboto', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            padding: 10px; /* Mniejszy padding na start */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,60 +32,66 @@
             justify-content: center;
             width: 100%;
             max-width: 1200px;
+            padding-bottom: 20px;
         }
 
         /* --- LEWY PANEL (Kontrolki) --- */
         .controls-panel {
             flex: 1;
             min-width: 300px;
-            max-width: 400px;
+            max-width: 450px;
             background: #fff;
-            padding: 25px;
-            border-radius: 10px;
+            padding: 20px;
+            border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             height: fit-content;
         }
 
-        h3 { margin: 0 0 10px 0; color: var(--primary-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 18px; }
+        h3 { margin: 5px 0 10px 0; color: var(--primary-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .control-group { margin-bottom: 5px; }
-        label { font-size: 13px; font-weight: bold; color: #666; display: block; margin-bottom: 4px; }
+        label { font-size: 13px; font-weight: bold; color: #555; display: block; margin-bottom: 6px; }
         
         input[type="text"], select {
-            width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box;
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px;
+        }
+        
+        /* Większe suwaki na mobile */
+        input[type="range"] { 
+            width: 100%; cursor: pointer; margin: 10px 0; 
+            height: 20px; /* Łatwiej trafić palcem */
         }
 
-        input[type="range"] { width: 100%; cursor: pointer; }
-
-        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
         .tab-btn {
-            flex: 1; padding: 8px; border: 1px solid #ddd; background: #f9f9f9;
-            cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 13px;
+            flex: 1; padding: 10px; border: 1px solid #ddd; background: #f9f9f9;
+            cursor: pointer; border-radius: 6px; font-weight: 600; font-size: 14px;
+            transition: all 0.2s;
         }
         .tab-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
         .mode-content { display: none; }
         .mode-content.active { display: block; }
 
         .btn-action {
-            width: 100%; padding: 12px; border: none; border-radius: 6px;
-            font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 15px;
-            transition: 0.2s;
+            width: 100%; padding: 14px; border: none; border-radius: 8px;
+            font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px;
+            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-green { background: #27ae60; color: white; }
-        .btn-green:hover { background: #219150; }
-        .btn-red { background: #e74c3c; color: white; font-size: 12px; padding: 6px; width: auto;}
+        .btn-green:hover { background: #219150; transform: translateY(-1px); }
+        .btn-red { background: #e74c3c; color: white; font-size: 12px; padding: 8px 12px; border-radius: 4px; width: auto;}
 
         /* --- PRAWY PANEL (Podgląd) --- */
         .preview-area {
-            flex: 2;
-            min-width: 350px;
+            flex: 1;
+            min-width: 320px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 20px;
+            align-items: flex-start;
+            padding: 10px;
         }
 
         #paper-sheet {
@@ -93,9 +99,19 @@
             position: relative;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            /* Tekstura papieru */
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
             display: inline-block; 
-            min-width: 250px;
+            min-width: 280px;
+            transition: box-shadow 0.3s, background 0.3s;
+        }
+
+        /* Styl dla trybu przezroczystego (aplikowany JS przy pobieraniu) */
+        .transparent-mode {
+            background-color: transparent !important;
+            background-image: none !important;
+            box-shadow: none !important;
+            border: none !important;
         }
 
         .signature-block {
@@ -142,23 +158,20 @@
             background: rgba(52, 152, 219, 0.03);
         }
 
-        /* --- PIECZĘĆ (DRAGGABLE) --- */
+        /* --- PIECZĘĆ --- */
         .stamp-container {
             position: absolute;
             width: 120px; height: 120px;
             z-index: 100;
             cursor: move;
             user-select: none;
-            left: -40px; top: 10px;
+            left: -30px; top: 10px;
             display: flex; justify-content: center; align-items: center;
             mix-blend-mode: multiply;
             transform: rotate(-15deg);
         }
         
-        .stamp-container:active {
-            opacity: 0.7;
-            transform: rotate(-15deg) scale(1.05);
-        }
+        .stamp-container:active { opacity: 0.7; transform: rotate(-15deg) scale(1.05); }
 
         .css-stamp {
             width: 100%; height: 100%;
@@ -172,85 +185,72 @@
         .stamp-img-custom { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
         
         .drag-hint {
-            position: absolute; top: -20px; left: 0; right: 0;
+            position: absolute; top: -25px; left: 0; right: 0;
             font-size: 10px; background: #333; color: #fff;
-            padding: 2px; border-radius: 3px; display: none;
+            padding: 4px; border-radius: 4px; display: none; text-align: center;
         }
         .stamp-container:hover .drag-hint { display: block; }
+        /* Na mobile pokazujemy hint zawsze przez 2 sekundy po załadowaniu lub wcale */
 
+        /* --- STYLIZACJA CHECKBOXÓW (Radio buttony jako kafelki) --- */
+        .bg-options { display: flex; gap: 10px; margin-top: 5px; }
+        .bg-option {
+            flex: 1; display: flex; align-items: center; gap: 5px;
+            padding: 10px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 13px;
+        }
+        .bg-option:hover { background: #f5f5f5; }
+        .bg-option input { margin: 0; }
+
+
+        /* --- RESPONSYWNOŚĆ (Mobile) --- */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .main-wrapper { gap: 10px; }
+            
+            .controls-panel {
+                min-width: 100%; width: 100%;
+                padding: 15px; order: 2; /* Kontrolki pod podglądem na bardzo małych, lub nad - zależy od preferencji */
+            }
+            
+            .preview-area {
+                min-width: 100%; width: 100%;
+                padding: 5px;
+                order: 1; /* Podgląd pierwszy na górze */
+                background: #e0e5e8; /* Lekkie wyróżnienie tła obszaru podglądu */
+                border-radius: 8px;
+                overflow-x: auto; /* Pozwala przewijać jeśli podpis jest bardzo szeroki */
+            }
+
+            #paper-sheet {
+                /* Na mobile papier zajmuje max szerokość ekranu */
+                max-width: 100%; 
+                min-width: auto;
+                box-sizing: border-box;
+            }
+
+            .signature-block {
+                width: 100% !important; /* Wymuszamy responsywność bloku na mobile */
+                max-width: 320px; /* Ale nie szerszy niż typowy ekran */
+            }
+            
+            /* Ukrywamy suwak szerokości na mobile, bo i tak wymuszamy 100% */
+            .hide-mobile { display: none; }
+            
+            h3 { font-size: 15px; }
+            .btn-action { position: sticky; bottom: 10px; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <div class="controls-panel">
-        <h3>1. Treść</h3>
-        <div class="control-group">
-            <input type="text" id="roleInput" placeholder="Stanowisko" value="Główny Księgowy" oninput="updateContent()">
-        </div>
-        
-        <div class="tabs">
-            <button class="tab-btn active" onclick="setMode('type')" id="btnType">Klawiatura</button>
-            <button class="tab-btn" onclick="setMode('draw')" id="btnDraw">Rysowanie</button>
-        </div>
-
-        <div id="modeType" class="mode-content active">
-            <input type="text" id="nameInput" value="Jan Kowalski" oninput="updateContent()">
-            <select id="fontSelect" onchange="updateContent()" style="margin-top:5px;">
-                <option value="'Nothing You Could Do', cursive">Styl 1: Szybki</option>
-                <option value="'Mrs Saint Delafield', cursive">Styl 2: Elegancki</option>
-            </select>
-        </div>
-
-        <div id="modeDraw" class="mode-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label>Grubość:</label>
-                <button class="btn-red" onclick="clearCanvas()">Wyczyść</button>
-            </div>
-            <input type="range" id="penSize" min="1" max="5" value="2">
-        </div>
-
-        <div class="control-group">
-            <label>Kolor tuszu:</label>
-            <select id="colorSelect" onchange="updateColors()">
-                <option value="#000080">Granatowy</option>
-                <option value="#000000">Czarny</option>
-                <option value="#006400">Zielony</option>
-            </select>
-        </div>
-
-        <h3>2. Pieczęć</h3>
-        <input type="file" id="stampUpload" accept="image/*" style="font-size:12px;">
-        <div style="margin-top:5px; font-size:12px;">
-            <label style="display:inline;"><input type="checkbox" id="bwCheck" onchange="processStampImage()"> Czarno-biała (Wymuś)</label>
-            <label style="display:inline; margin-left:10px;"><input type="checkbox" id="noStampCheck" onchange="toggleStamp()"> Ukryj</label>
-        </div>
-
-        <h3>3. Pozycjonowanie (Dopasuj)</h3>
-        <div class="control-group">
-            <label>Szerokość linii/obszaru:</label>
-            <input type="range" min="150" max="500" value="300" oninput="adjustLayout()" id="widthRange">
-        </div>
-        <div class="control-group">
-            <label>Przesunięcie podpisu (Góra/Dół):</label>
-            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posYRange">
-        </div>
-        <div class="control-group">
-            <label>Przesunięcie podpisu (Lewo/Prawo):</label>
-            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posXRange">
-        </div>
-        <p style="font-size:11px; color:#888;">💡 Wskazówka: Pieczęć możesz przesuwać myszką bezpośrednio na obrazku.</p>
-
-        <button class="btn-action btn-green" onclick="downloadPNG()">⬇ Pobierz (Dopasowany)</button>
-    </div>
 
     <div class="preview-area">
         <div id="paper-sheet">
-            
             <div class="signature-block" id="sigBlock">
                 
                 <div class="stamp-container" id="draggableStamp">
-                    <div class="drag-hint">Przesuń mnie</div>
+                    <div class="drag-hint">Chwyć i przesuń</div>
                     <div id="stampInner" class="css-stamp">
                         <span>ZATWIERDZONO<br>ORYGINAŁ</span>
                     </div>
@@ -267,6 +267,86 @@
             </div>
         </div>
     </div>
+
+    <div class="controls-panel">
+        
+        <h3>1. Ustawienia Pliku</h3>
+        <div class="bg-options">
+            <label class="bg-option">
+                <input type="radio" name="bgType" value="white" checked>
+                Tło Białe
+            </label>
+            <label class="bg-option">
+                <input type="radio" name="bgType" value="transparent">
+                Tło Przeźroczyste
+            </label>
+        </div>
+
+        <h3>2. Treść</h3>
+        <div class="control-group">
+            <input type="text" id="roleInput" placeholder="Stanowisko" value="Główny Księgowy" oninput="updateContent()">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="setMode('type')" id="btnType">Klawiatura</button>
+            <button class="tab-btn" onclick="setMode('draw')" id="btnDraw">Rysowanie</button>
+        </div>
+
+        <div id="modeType" class="mode-content active">
+            <input type="text" id="nameInput" value="Jan Kowalski" oninput="updateContent()">
+            <select id="fontSelect" onchange="updateContent()" style="margin-top:8px;">
+                <option value="'Nothing You Could Do', cursive">Styl 1: Szybki</option>
+                <option value="'Mrs Saint Delafield', cursive">Styl 2: Elegancki</option>
+            </select>
+        </div>
+
+        <div id="modeDraw" class="mode-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <label style="margin:0">Grubość linii:</label>
+                <button class="btn-red" onclick="clearCanvas()">Wyczyść</button>
+            </div>
+            <input type="range" id="penSize" min="1" max="5" value="2">
+        </div>
+
+        <div class="control-group">
+            <label>Kolor tuszu:</label>
+            <select id="colorSelect" onchange="updateColors()">
+                <option value="#000080">Granatowy</option>
+                <option value="#000000">Czarny</option>
+                <option value="#006400">Zielony</option>
+            </select>
+        </div>
+
+        <h3>3. Pieczęć</h3>
+        <input type="file" id="stampUpload" accept="image/*" style="font-size:12px; margin-bottom:10px;">
+        <div style="font-size:13px; display:flex; flex-wrap:wrap; gap:15px;">
+            <label style="display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="bwCheck" onchange="processStampImage()"> 
+                Czarno-biała
+            </label>
+            <label style="display:flex; align-items:center; gap:5px;">
+                <input type="checkbox" id="noStampCheck" onchange="toggleStamp()"> 
+                Ukryj
+            </label>
+        </div>
+
+        <h3>4. Dopasowanie</h3>
+        <div class="control-group hide-mobile">
+            <label>Szerokość całego bloku:</label>
+            <input type="range" min="200" max="500" value="300" oninput="adjustLayout()" id="widthRange">
+        </div>
+        <div class="control-group">
+            <label>Przesunięcie podpisu (Góra/Dół):</label>
+            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posYRange">
+        </div>
+        <div class="control-group">
+            <label>Przesunięcie podpisu (Lewo/Prawo):</label>
+            <input type="range" min="-50" max="50" value="0" oninput="adjustLayout()" id="posXRange">
+        </div>
+
+        <button class="btn-action btn-green" onclick="downloadPNG()">⬇ POBIERZ PNG</button>
+    </div>
+
 </div>
 
 <script>
@@ -278,8 +358,6 @@
     const ctx = canvas.getContext('2d');
     const stampDiv = document.getElementById('draggableStamp');
     const stampInner = document.getElementById('stampInner');
-    
-    // Zmienne do przechowywania oryginalnej pieczęci
     let originalStampSrc = null;
 
     // --- 1. TREŚĆ I KOLORY ---
@@ -319,8 +397,13 @@
 
     // --- 3. POZYCJONOWANIE ---
     function adjustLayout() {
-        const width = document.getElementById('widthRange').value;
-        sigBlock.style.width = width + 'px';
+        // Na mobile ignorujemy suwak szerokości
+        if (window.innerWidth > 768) {
+            const width = document.getElementById('widthRange').value;
+            sigBlock.style.width = width + 'px';
+        } else {
+            sigBlock.style.width = '100%';
+        }
 
         const y = document.getElementById('posYRange').value;
         const x = document.getElementById('posXRange').value;
@@ -353,8 +436,10 @@
         const clientX = e.clientX || e.touches[0].clientX;
         const clientY = e.clientY || e.touches[0].clientY;
         const parentRect = sigBlock.getBoundingClientRect();
+        
         let newLeft = clientX - parentRect.left - offset.x;
         let newTop = clientY - parentRect.top - offset.y;
+        
         stampDiv.style.left = newLeft + 'px';
         stampDiv.style.top = newTop + 'px';
     }
@@ -364,60 +449,45 @@
 
     function endDrag() { isDragging = false; stampDiv.style.cursor = 'move'; }
 
-    // --- 5. OBSŁUGA PIECZĘCI (ZAAWANSOWANA KONWERSJA BW) ---
+    // --- 5. OBSŁUGA PIECZĘCI ---
     document.getElementById('stampUpload').addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
             reader.onload = function(evt) {
-                originalStampSrc = evt.target.result; // Zapisz oryginał
-                processStampImage(); // Uruchom przetwarzanie
+                originalStampSrc = evt.target.result;
+                processStampImage();
             }
             reader.readAsDataURL(this.files[0]);
         }
     });
 
     function processStampImage() {
-        if (!originalStampSrc) return; // Jeśli nic nie wgrano, nic nie rób
-
+        if (!originalStampSrc) return;
         const isBW = document.getElementById('bwCheck').checked;
         const img = new Image();
         img.src = originalStampSrc;
 
         img.onload = () => {
             if (isBW) {
-                // FIZYCZNA KONWERSJA NA BW (PIKSELE)
                 const tempCanvas = document.createElement('canvas');
                 const tCtx = tempCanvas.getContext('2d');
                 tempCanvas.width = img.width;
                 tempCanvas.height = img.height;
-                
                 tCtx.drawImage(img, 0, 0);
                 const imgData = tCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
                 const data = imgData.data;
 
-                // Algorytm szarości i kontrastu
                 for (let i = 0; i < data.length; i += 4) {
-                    // Średnia jasność
                     const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                    // Proste progowanie lub pozostawienie szarości
-                    // Tu robimy szarość + lekki kontrast
-                    let gray = avg;
-                    
-                    data[i] = gray;     // R
-                    data[i + 1] = gray; // G
-                    data[i + 2] = gray; // B
-                    // Alpha (data[i+3]) zostawiamy bez zmian
+                    const contrast = avg > 120 ? 255 : avg * 0.5; // Prosty kontrast
+                    data[i] = contrast; data[i + 1] = contrast; data[i + 2] = contrast;
                 }
                 tCtx.putImageData(imgData, 0, 0);
-                
-                // Wstawiamy przerobiony obrazek
                 stampInner.innerHTML = `<img src="${tempCanvas.toDataURL()}" class="stamp-img-custom">`;
             } else {
-                // Wstawiamy oryginał
                 stampInner.innerHTML = `<img src="${originalStampSrc}" class="stamp-img-custom">`;
             }
-            
-            stampInner.className = ''; // usuwamy styl CSS ramki
+            stampInner.className = '';
         };
     }
 
@@ -452,7 +522,6 @@
     });
 
     function drawLine(e) { if(drawing) drawStroke(e.offsetX, e.offsetY); }
-
     function drawStroke(x, y) {
         ctx.lineJoin = 'round'; ctx.lineCap = 'round';
         ctx.lineWidth = document.getElementById('penSize').value;
@@ -461,25 +530,38 @@
     }
     function clearCanvas() { ctx.clearRect(0,0,canvas.width, canvas.height); }
 
-    // --- 7. POBIERANIE ---
+    // --- 7. POBIERANIE (Z OBSŁUGĄ PRZEŹROCZYSTOŚCI) ---
     function downloadPNG() {
         const element = document.getElementById('paper-sheet');
+        const bgType = document.querySelector('input[name="bgType"]:checked').value;
+        
+        // 1. Przygotowanie do zrzutu
         if(mode === 'draw') canvas.classList.remove('canvas-helper');
+        
+        // Jeśli wybrano przezroczystość, usuwamy style papieru
+        if (bgType === 'transparent') {
+            element.classList.add('transparent-mode');
+        }
 
         html2canvas(element, {
             scale: 3,
-            backgroundColor: null
+            backgroundColor: null // To kluczowe dla przezroczystości
         }).then(c => {
             const link = document.createElement('a');
-            link.download = 'podpis.png';
+            link.download = `podpis_${bgType}.png`;
             link.href = c.toDataURL('image/png');
             link.click();
             
+            // 2. Sprzątanie po zrzucie
             if(mode === 'draw') canvas.classList.add('canvas-helper');
+            element.classList.remove('transparent-mode');
         });
     }
 
+    // Inicjalizacja
     adjustLayout(); 
+    // Dodatkowy nasłuch resize dla mobile
+    window.addEventListener('resize', adjustLayout);
 </script>
 
 </body>
